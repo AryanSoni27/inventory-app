@@ -12,6 +12,7 @@ import com.inventory.repository.StockTransactionRepository;
 import com.inventory.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
@@ -93,6 +94,7 @@ public class ItemService {
         return mapToResponse(saved, false);
     }
 
+    @Transactional
     public void deleteItem(Long id, String username, boolean isAdmin) {
         Item item = itemRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Item not found with id: " + id));
@@ -101,6 +103,8 @@ public class ItemService {
             throw new ResourceNotFoundException("Item not found with id: " + id);
         }
 
+        // Delete all related transactions first to avoid foreign key constraint
+        transactionRepository.deleteByItemId(id);
         itemRepository.deleteById(id);
     }
 

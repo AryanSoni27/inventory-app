@@ -14,4 +14,6 @@ public interface StockTransactionRepository extends JpaRepository<StockTransacti
     List<StockTransaction> findTop10ByOrderByCreatedAtDesc();
     
     List<StockTransaction> findTop10ByItem_UserOrderByCreatedAtDesc(User user);
+
+    void deleteByItemId(Long itemId);
 }
