@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
-import { useAuth } from '@/context/AuthContext';
 import StockModal from '@/components/StockModal';
 import AddItemModal from '@/components/AddItemModal';
 
@@ -27,7 +26,6 @@ export default function ItemsPage() {
     type: 'ADD' | 'REMOVE';
   }>({ isOpen: false, itemId: 0, itemName: '', type: 'ADD' });
   const router = useRouter();
-  const { role } = useAuth();
 
   useEffect(() => {
     fetchItems();
