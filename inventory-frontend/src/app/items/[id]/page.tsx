@@ -143,13 +143,13 @@ export default function ItemDetailPage() {
           <div>
             <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">Price</p>
             <p className="text-base sm:text-lg font-semibold text-gray-900 mt-1">
-              {item.price ? `$${Number(item.price).toFixed(2)}` : '—'}
+              {item.price ? `₹${Number(item.price).toFixed(2)}` : '—'}
             </p>
           </div>
           <div>
             <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">Total Value</p>
             <p className="text-base sm:text-lg font-semibold text-gray-900 mt-1">
-              {item.price ? `$${(item.quantity * Number(item.price)).toFixed(2)}` : '—'}
+              {item.price ? `₹${(item.quantity * Number(item.price)).toFixed(2)}` : '—'}
             </p>
           </div>
         </div>

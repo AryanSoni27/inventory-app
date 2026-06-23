@@ -130,7 +130,7 @@ export default function AddItemModal({ isOpen, onClose, onSuccess }: AddItemModa
 
             <div className="col-span-2 sm:col-span-1">
               <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                Price ($)
+                Price (₹)
               </label>
               <input
                 type="number"

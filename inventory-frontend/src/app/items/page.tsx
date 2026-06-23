@@ -137,7 +137,7 @@ export default function ItemsPage() {
                       </span>
                     </td>
                     <td className="py-4 px-6 text-sm text-gray-900 font-medium">
-                      {item.price ? `$${Number(item.price).toFixed(2)}` : '—'}
+                      {item.price ? `₹${Number(item.price).toFixed(2)}` : '—'}
                     </td>
                     <td className="py-4 px-6">
                       <div className="flex items-center justify-end gap-2">
@@ -200,10 +200,10 @@ export default function ItemsPage() {
                 {/* Item meta */}
                 <div className="flex items-center gap-4 mb-3 text-xs text-gray-500">
                   {item.price ? (
-                    <span className="font-medium text-gray-700">${Number(item.price).toFixed(2)}</span>
+                    <span className="font-medium text-gray-700">₹{Number(item.price).toFixed(2)}</span>
                   ) : null}
                   {item.price ? (
-                    <span>Total: ${(item.quantity * Number(item.price)).toFixed(2)}</span>
+                    <span>Total: ₹{(item.quantity * Number(item.price)).toFixed(2)}</span>
                   ) : null}
                 </div>
 

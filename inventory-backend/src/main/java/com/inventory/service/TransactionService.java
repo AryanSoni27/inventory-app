@@ -27,9 +27,13 @@ public class TransactionService {
     private final UserRepository userRepository;
 
     @Transactional
-    public ItemResponse processTransaction(TransactionRequest request, String username) {
+    public ItemResponse processTransaction(TransactionRequest request, String username, boolean isAdmin) {
         Item item = itemRepository.findById(request.getItemId())
                 .orElseThrow(() -> new ResourceNotFoundException("Item not found with id: " + request.getItemId()));
+
+        if (!isAdmin && !item.getUser().getUsername().equals(username)) {
+            throw new ResourceNotFoundException("Item not found with id: " + request.getItemId());
+        }
 
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + username));
@@ -71,8 +75,11 @@ public class TransactionService {
                 .build();
     }
 
-    public List<TransactionResponse> getTransactionsByItemId(Long itemId) {
-        if (!itemRepository.existsById(itemId)) {
+    public List<TransactionResponse> getTransactionsByItemId(Long itemId, String username, boolean isAdmin) {
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new ResourceNotFoundException("Item not found with id: " + itemId));
+
+        if (!isAdmin && !item.getUser().getUsername().equals(username)) {
             throw new ResourceNotFoundException("Item not found with id: " + itemId);
         }
 
@@ -81,8 +88,17 @@ public class TransactionService {
                 .collect(Collectors.toList());
     }
 
-    public List<TransactionResponse> getRecentTransactions() {
-        return transactionRepository.findTop10ByOrderByCreatedAtDesc().stream()
+    public List<TransactionResponse> getRecentTransactions(String username, boolean isAdmin) {
+        List<StockTransaction> transactions;
+        if (isAdmin) {
+            transactions = transactionRepository.findTop10ByOrderByCreatedAtDesc();
+        } else {
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new ResourceNotFoundException("User not found: " + username));
+            transactions = transactionRepository.findTop10ByItem_UserOrderByCreatedAtDesc(user);
+        }
+
+        return transactions.stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }

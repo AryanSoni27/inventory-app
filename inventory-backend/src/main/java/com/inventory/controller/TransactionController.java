@@ -20,23 +20,28 @@ public class TransactionController {
 
     private final TransactionService transactionService;
 
+    private boolean isAdmin(Authentication authentication) {
+        return authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+    }
+
     @PostMapping
     public ResponseEntity<ItemResponse> processTransaction(
             @Valid @RequestBody TransactionRequest request,
             Authentication authentication
     ) {
         String username = authentication.getName();
-        ItemResponse response = transactionService.processTransaction(request, username);
+        ItemResponse response = transactionService.processTransaction(request, username, isAdmin(authentication));
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/item/{itemId}")
-    public ResponseEntity<List<TransactionResponse>> getTransactionsByItem(@PathVariable Long itemId) {
-        return ResponseEntity.ok(transactionService.getTransactionsByItemId(itemId));
+    public ResponseEntity<List<TransactionResponse>> getTransactionsByItem(@PathVariable Long itemId, Authentication authentication) {
+        return ResponseEntity.ok(transactionService.getTransactionsByItemId(itemId, authentication.getName(), isAdmin(authentication)));
     }
 
     @GetMapping("/recent")
-    public ResponseEntity<List<TransactionResponse>> getRecentTransactions() {
-        return ResponseEntity.ok(transactionService.getRecentTransactions());
+    public ResponseEntity<List<TransactionResponse>> getRecentTransactions(Authentication authentication) {
+        return ResponseEntity.ok(transactionService.getRecentTransactions(authentication.getName(), isAdmin(authentication)));
     }
 }
