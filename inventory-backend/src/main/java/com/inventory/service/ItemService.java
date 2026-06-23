@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -70,6 +71,7 @@ public class ItemService {
                 .quantity(request.getQuantity() != null ? request.getQuantity() : 0)
                 .unit(request.getUnit())
                 .price(request.getPrice())
+                .createdAt(LocalDateTime.now())
                 .build();
 
         Item saved = itemRepository.save(item);
