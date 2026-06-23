@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  # ========================
+  # MySQL Database
+  # ========================
+  mysql:
+    image: mysql:8.0
+    container_name: inventory-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-inventory}
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - inventory-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ========================
+  # Spring Boot Backend
+  # ========================
+  backend:
+    build:
+      context: ./inventory-backend
+      dockerfile: Dockerfile
+    container_name: inventory-backend
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE:-inventory}
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      APP_JWT_SECRET: ${JWT_SECRET:-MySuperSecretKeyForInventoryApp2024XYZ}
+      APP_JWT_EXPIRATION: ${JWT_EXPIRATION:-86400000}
+    ports:
+      - "8080:8080"
+    networks:
+      - inventory-network
+
+  # ========================
+  # Next.js Frontend
+  # ========================
+  frontend:
+    build:
+      context: ./inventory-frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080/api}
+    container_name: inventory-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+    networks:
+      - inventory-network
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  inventory-network:
+    driver: bridge
