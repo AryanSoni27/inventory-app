@@ -96,24 +96,24 @@ export default function DashboardPage() {
 
   return (
     <div>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-sm text-gray-500 mt-1">Overview of your inventory status</p>
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Dashboard</h1>
+        <p className="text-xs sm:text-sm text-gray-500 mt-1">Overview of your inventory status</p>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
         {stats.map((stat) => (
           <div
             key={stat.label}
-            className={`bg-white rounded-xl border ${stat.borderColor} p-6 hover:shadow-md transition-all duration-200`}
+            className={`bg-white rounded-xl border ${stat.borderColor} p-4 sm:p-6 hover:shadow-md transition-all duration-200`}
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500">{stat.label}</p>
-                <p className="text-2xl font-bold text-gray-900 mt-1">{stat.value}</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-500">{stat.label}</p>
+                <p className="text-xl sm:text-2xl font-bold text-gray-900 mt-1">{stat.value}</p>
               </div>
-              <div className={`w-12 h-12 rounded-xl ${stat.color} flex items-center justify-center`}>
+              <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl ${stat.color} flex items-center justify-center`}>
                 {stat.icon}
               </div>
             </div>
@@ -123,9 +123,9 @@ export default function DashboardPage() {
 
       {/* Recent Transactions */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">Recent Transactions</h2>
-          <p className="text-sm text-gray-500">Last 10 stock movements across all items</p>
+        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200">
+          <h2 className="text-base sm:text-lg font-semibold text-gray-900">Recent Transactions</h2>
+          <p className="text-xs sm:text-sm text-gray-500">Last 10 stock movements across all items</p>
         </div>
         <TransactionTable transactions={transactions} showItemName={true} />
       </div>

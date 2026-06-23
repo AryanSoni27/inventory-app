@@ -45,22 +45,26 @@ export default function StockModal({ isOpen, onClose, itemId, itemName, type, on
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm modal-overlay" onClick={onClose}></div>
 
       {/* Modal */}
-      <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 modal-content">
-        <div className={`px-6 py-4 rounded-t-xl border-b ${type === 'ADD' ? 'bg-emerald-50 border-emerald-100' : 'bg-red-50 border-red-100'
+      <div className="relative bg-white rounded-t-2xl sm:rounded-xl shadow-2xl w-full sm:max-w-md sm:mx-4 modal-content">
+        <div className={`px-5 sm:px-6 py-4 rounded-t-2xl sm:rounded-t-xl border-b ${
+          type === 'ADD' ? 'bg-emerald-50 border-emerald-100' : 'bg-red-50 border-red-100'
+        }`}>
+          {/* Mobile drag handle */}
+          <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-3 sm:hidden"></div>
+          <h3 className={`text-base sm:text-lg font-semibold ${
+            type === 'ADD' ? 'text-emerald-800' : 'text-red-800'
           }`}>
-          <h3 className={`text-lg font-semibold ${type === 'ADD' ? 'text-emerald-800' : 'text-red-800'
-            }`}>
             {type === 'ADD' ? '📦 Add Stock' : '📤 Remove Stock'}
           </h3>
-          <p className="text-sm text-gray-500 mt-0.5">{itemName}</p>
+          <p className="text-xs sm:text-sm text-gray-500 mt-0.5">{itemName}</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-5 sm:p-6 space-y-4">
           {error && (
             <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
               {error}
@@ -95,7 +99,7 @@ export default function StockModal({ isOpen, onClose, itemId, itemName, type, on
             />
           </div>
 
-          <div className="flex gap-3 pt-2">
+          <div className="flex gap-3 pt-2 pb-safe">
             <button
               type="button"
               onClick={onClose}
@@ -106,10 +110,11 @@ export default function StockModal({ isOpen, onClose, itemId, itemName, type, on
             <button
               type="submit"
               disabled={loading}
-              className={`flex-1 px-4 py-2.5 rounded-lg text-sm font-medium text-white transition-all disabled:opacity-50 ${type === 'ADD'
+              className={`flex-1 px-4 py-2.5 rounded-lg text-sm font-medium text-white transition-all disabled:opacity-50 ${
+                type === 'ADD'
                   ? 'bg-emerald-600 hover:bg-emerald-700'
                   : 'bg-red-600 hover:bg-red-700'
-                }`}
+              }`}
             >
               {loading ? 'Processing...' : type === 'ADD' ? 'Add Stock' : 'Remove Stock'}
             </button>
