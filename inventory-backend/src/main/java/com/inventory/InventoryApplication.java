@@ -7,7 +7,10 @@ import java.util.TimeZone;
 
 import jakarta.annotation.PostConstruct;
 
+import org.springframework.scheduling.annotation.EnableScheduling;
+
 @SpringBootApplication
+@EnableScheduling
 public class InventoryApplication {
 
     @PostConstruct

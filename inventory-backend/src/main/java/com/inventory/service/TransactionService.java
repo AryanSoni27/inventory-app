@@ -1,7 +1,9 @@
 package com.inventory.service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 import com.inventory.dto.ItemResponse;
-import com.inventory.dto.StatisticsResponse;
 import com.inventory.dto.TransactionRequest;
 import com.inventory.dto.TransactionResponse;
 import com.inventory.entity.Item;
@@ -12,12 +14,13 @@ import com.inventory.exception.ResourceNotFoundException;
 import com.inventory.repository.ItemRepository;
 import com.inventory.repository.StockTransactionRepository;
 import com.inventory.repository.UserRepository;
+
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -61,6 +64,7 @@ public class TransactionService {
                 .transactionType(request.getTransactionType())
                 .quantity(request.getQuantity())
                 .note(request.getNote())
+                .createdAt(LocalDateTime.now())
                 .build();
 
         transactionRepository.save(transaction);
@@ -103,73 +107,6 @@ public class TransactionService {
         return transactions.stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
-    }
-
-    public StatisticsResponse getStatistics(LocalDateTime start, LocalDateTime end,
-                                             TransactionType type, String username, boolean isAdmin) {
-        List<StockTransaction> transactions;
-
-        if (isAdmin) {
-            if (type != null) {
-                transactions = transactionRepository
-                        .findByTransactionTypeAndCreatedAtBetweenOrderByCreatedAtDesc(type, start, end);
-            } else {
-                transactions = transactionRepository
-                        .findByCreatedAtBetweenOrderByCreatedAtDesc(start, end);
-            }
-        } else {
-            User user = userRepository.findByUsername(username)
-                    .orElseThrow(() -> new ResourceNotFoundException("User not found: " + username));
-            if (type != null) {
-                transactions = transactionRepository
-                        .findByItem_UserAndTransactionTypeAndCreatedAtBetweenOrderByCreatedAtDesc(user, type, start, end);
-            } else {
-                transactions = transactionRepository
-                        .findByItem_UserAndCreatedAtBetweenOrderByCreatedAtDesc(user, start, end);
-            }
-        }
-
-        // Calculate totals
-        int totalSold = 0;
-        int totalRestocked = 0;
-
-        // Group by item name for summaries
-        Map<String, int[]> itemMap = new LinkedHashMap<>(); // itemName -> [sold, restocked, count]
-
-        for (StockTransaction tx : transactions) {
-            String itemName = tx.getItem().getName();
-            int[] counts = itemMap.computeIfAbsent(itemName, k -> new int[3]);
-            counts[2]++; // transaction count
-
-            if (tx.getTransactionType() == TransactionType.REMOVE) {
-                counts[0] += tx.getQuantity();
-                totalSold += tx.getQuantity();
-            } else if (tx.getTransactionType() == TransactionType.ADD) {
-                counts[1] += tx.getQuantity();
-                totalRestocked += tx.getQuantity();
-            }
-        }
-
-        List<StatisticsResponse.ItemSummary> itemSummaries = itemMap.entrySet().stream()
-                .map(entry -> StatisticsResponse.ItemSummary.builder()
-                        .itemName(entry.getKey())
-                        .soldQuantity(entry.getValue()[0])
-                        .restockedQuantity(entry.getValue()[1])
-                        .transactionCount(entry.getValue()[2])
-                        .build())
-                .collect(Collectors.toList());
-
-        List<TransactionResponse> transactionResponses = transactions.stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
-
-        return StatisticsResponse.builder()
-                .totalSoldQuantity(totalSold)
-                .totalRestockedQuantity(totalRestocked)
-                .totalTransactions(transactions.size())
-                .itemSummaries(itemSummaries)
-                .transactions(transactionResponses)
-                .build();
     }
 
     private TransactionResponse mapToResponse(StockTransaction tx) {
